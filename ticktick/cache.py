@@ -37,6 +37,8 @@ class CacheHandler:
             else:
                 log.warning(f"Cache could not be read at: {self.path}")
 
+        print(access_token_info)
+
         return access_token_info
 
     def write_token_to_cache(self, access_token_info):
