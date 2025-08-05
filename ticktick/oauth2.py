@@ -126,6 +126,7 @@ class OAuth2:
         # Initialize code parameter
         self._code = None
 
+        print(cache_path)
         # Set the cache handler
         self.cache = CacheHandler(cache_path)
 
