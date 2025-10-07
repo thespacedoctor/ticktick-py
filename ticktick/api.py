@@ -17,8 +17,8 @@ class TickTickClient:
 
     INITIAL_BATCH_URL = BASE_URL + 'batch/check/0'
 
-    USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:123.0) Gecko/20100101 Firefox/123.0"
-    X_DEVICE_ = '{"platform":"web","os":"macOS 10.15.7","device":"Safari 605.1.15","name":"","version":6060,"id":"66e7' + secrets.token_hex(10) + '","channel":"website","campaign":"","websocket":"66f7ac74df60f62a433c0aac"}'
+    USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 15.7; rv:143.0) Gecko/20100101 Firefox/143.0"
+    X_DEVICE_ = '{"platform":"web","os":"Windows 10","device":"Chrome 122.0.0.0","name":"","version":5070,"id":"641939e6e6802138573ecf3b","channel":"website","campaign":"","websocket":""}'
 
     HEADERS = {'User-Agent': USER_AGENT,
                'x-device': X_DEVICE_}
@@ -100,7 +100,8 @@ class TickTickClient:
             'remember': True
         }
 
-        response = self.http_post(url, json=user_info, params=parameters, headers=self.HEADERS)
+        response = self.http_post(
+            url, json=user_info, params=parameters, headers=self.HEADERS)
 
         self.access_token = response['token']
         self.cookies['t'] = self.access_token
@@ -119,6 +120,7 @@ class TickTickClient:
         """
         if response.status_code != 200:
             print(response.status_code)
+            print(response.text)
             raise RuntimeError(error_message)
 
     def _settings(self):
@@ -133,7 +135,8 @@ class TickTickClient:
         parameters = {
             'includeWeb': True
         }
-        response = self.http_get(url, params=parameters, cookies=self.cookies, headers=self.HEADERS)
+        response = self.http_get(
+            url, params=parameters, cookies=self.cookies, headers=self.HEADERS)
 
         self.time_zone = response['timeZone']
         self.profile_id = response['id']
@@ -152,7 +155,8 @@ class TickTickClient:
         Raises:
             RunTimeError: If the request could not be completed.
         """
-        response = self.http_get(self.INITIAL_BATCH_URL, cookies=self.cookies, headers=self.HEADERS)
+        response = self.http_get(
+            self.INITIAL_BATCH_URL, cookies=self.cookies, headers=self.HEADERS)
 
         # Inbox Id
         self.inbox_id = response['inboxId']
@@ -389,7 +393,8 @@ class TickTickClient:
             raise ValueError('Must Include Field(s) To Be Searched For')
 
         if search is not None and search not in self.state:
-            raise KeyError(f"'{search}' Is Not Present In self.state Dictionary")
+            raise KeyError(
+                f"'{search}' Is Not Present In self.state Dictionary")
 
         objects = []
         if search is not None:
@@ -483,7 +488,8 @@ class TickTickClient:
             KeyError: If the search key provided is not a key in [`state`](api.md#state).
         """
         if search is not None and search not in self.state:
-            raise KeyError(f"'{search}' Is Not Present In self.state Dictionary")
+            raise KeyError(
+                f"'{search}' Is Not Present In self.state Dictionary")
 
         # Search just in the desired list
         if search is not None:
@@ -549,7 +555,8 @@ class TickTickClient:
 
         """
         if search is not None and search not in self.state:
-            raise KeyError(f"'{search}' Is Not Present In self.state Dictionary")
+            raise KeyError(
+                f"'{search}' Is Not Present In self.state Dictionary")
 
         # Search just in the desired list
         if search is not None:
@@ -624,7 +631,8 @@ class TickTickClient:
             raise ValueError('Must Include Field(s) To Be Searched For')
 
         if search is not None and search not in self.state:
-            raise KeyError(f"'{search}' Is Not Present In self.state Dictionary")
+            raise KeyError(
+                f"'{search}' Is Not Present In self.state Dictionary")
 
         # Search just in the desired list
         if search is not None:
