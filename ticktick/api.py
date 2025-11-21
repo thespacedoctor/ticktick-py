@@ -11,17 +11,16 @@ from ticktick.oauth2 import OAuth2
 
 
 class TickTickClient:
-    BASE_URL = 'https://api.ticktick.com/api/v2/'
+    BASE_URL = "https://api.ticktick.com/api/v2/"
 
-    OPEN_API_BASE_URL = 'https://api.ticktick.com'
+    OPEN_API_BASE_URL = "https://api.ticktick.com"
 
-    INITIAL_BATCH_URL = BASE_URL + 'batch/check/0'
+    INITIAL_BATCH_URL = BASE_URL + "batch/check/0"
 
-    USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 15.7; rv:143.0) Gecko/20100101 Firefox/143.0"
-    X_DEVICE_ = '{"platform":"web","os":"Windows 10","device":"Chrome 122.0.0.0","name":"","version":5070,"id":"641939e6e6802138573ecf3b","channel":"website","campaign":"","websocket":""}'
+    USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.1 Safari/605.1.15"
+    X_DEVICE_ = '{"platform":"web","os":"macOS 10.15.7","device":"Safari 605.1.15","name":"","version":6425,"id":"691ee812ea9939395ae31f9a","channel":"website","campaign":"","websocket":"6920794e8364c932029734c7"}'
 
-    HEADERS = {'User-Agent': USER_AGENT,
-               'x-device': X_DEVICE_}
+    HEADERS = {"User-Agent": USER_AGENT, "x-device": X_DEVICE_}
 
     def __init__(self, username: str, password: str, oauth: OAuth2) -> None:
         """
@@ -40,9 +39,9 @@ class TickTickClient:
 
         self.access_token = None
         self.cookies = {}
-        self.time_zone = ''
-        self.profile_id = ''
-        self.inbox_id = ''
+        self.time_zone = ""
+        self.profile_id = ""
+        self.inbox_id = ""
         self.state = {}
         self.reset_local_state()
         self.oauth_manager = oauth
@@ -73,12 +72,12 @@ class TickTickClient:
 
         """
         self.state = {
-            'projects': [],
-            'project_folders': [],
-            'tags': [],
-            'tasks': [],
-            'user_settings': {},
-            'profile': {}
+            "projects": [],
+            "project_folders": [],
+            "tags": [],
+            "tasks": [],
+            "user_settings": {},
+            "profile": {},
         }
 
     def _login(self, username: str, password: str) -> None:
@@ -90,21 +89,14 @@ class TickTickClient:
             password: TickTick Password
 
         """
-        url = self.BASE_URL + 'user/signon?wc=true&remember=true'
-        user_info = {
-            'username': username,
-            'password': password
-        }
-        parameters = {
-            'wc': True,
-            'remember': True
-        }
+        url = self.BASE_URL + "user/signon?wc=true&remember=true"
+        user_info = {"username": username, "password": password}
+        parameters = {"wc": True, "remember": True}
 
-        response = self.http_post(
-            url, json=user_info, params=parameters, headers=self.HEADERS)
+        response = self.http_post(url, json=user_info, params=parameters, headers=self.HEADERS)
 
-        self.access_token = response['token']
-        self.cookies['t'] = self.access_token
+        self.access_token = response["token"]
+        self.cookies["t"] = self.access_token
 
     @staticmethod
     def check_status_code(response, error_message: str) -> None:
@@ -131,15 +123,12 @@ class TickTickClient:
             The httpx response object.
         :return: httpx object containing the response from the get request
         """
-        url = self.BASE_URL + 'user/preferences/settings'
-        parameters = {
-            'includeWeb': True
-        }
-        response = self.http_get(
-            url, params=parameters, cookies=self.cookies, headers=self.HEADERS)
+        url = self.BASE_URL + "user/preferences/settings"
+        parameters = {"includeWeb": True}
+        response = self.http_get(url, params=parameters, cookies=self.cookies, headers=self.HEADERS)
 
-        self.time_zone = response['timeZone']
-        self.profile_id = response['id']
+        self.time_zone = response["timeZone"]
+        self.profile_id = response["id"]
 
         return response
 
@@ -155,19 +144,18 @@ class TickTickClient:
         Raises:
             RunTimeError: If the request could not be completed.
         """
-        response = self.http_get(
-            self.INITIAL_BATCH_URL, cookies=self.cookies, headers=self.HEADERS)
+        response = self.http_get(self.INITIAL_BATCH_URL, cookies=self.cookies, headers=self.HEADERS)
 
         # Inbox Id
-        self.inbox_id = response['inboxId']
+        self.inbox_id = response["inboxId"]
         # Set list groups
-        self.state['project_folders'] = response['projectGroups']
+        self.state["project_folders"] = response["projectGroups"]
         # Set lists
-        self.state['projects'] = response['projectProfiles']
+        self.state["projects"] = response["projectProfiles"]
         # Set Uncompleted Tasks
-        self.state['tasks'] = response['syncTaskBean']['update']
+        self.state["tasks"] = response["syncTaskBean"]["update"]
         # Set tags
-        self.state['tags'] = response['tags']
+        self.state["tags"] = response["tags"]
 
         return response
 
@@ -185,12 +173,12 @@ class TickTickClient:
         Raises:
             RunTimeError: If the request could not be completed.
         """
-        if 'headers' not in kwargs:
+        if "headers" not in kwargs:
             response = self._session.post(url, headers=self.HEADERS, **kwargs)
         else:
-            kwargs['headers'].update(self.HEADERS)
+            kwargs["headers"].update(self.HEADERS)
             response = self._session.post(url, **kwargs)
-        self.check_status_code(response, 'Could Not Complete Request')
+        self.check_status_code(response, "Could Not Complete Request")
 
         try:
             return response.json()
@@ -234,7 +222,7 @@ class TickTickClient:
             RunTimeError: If the request could not be completed.
         """
         response = self._session.get(url, **kwargs)
-        self.check_status_code(response, 'Could Not Complete Request')
+        self.check_status_code(response, "Could Not Complete Request")
 
         try:
             return response.json()
@@ -256,7 +244,7 @@ class TickTickClient:
             RunTimeError: If the request could not be completed.
         """
         response = self._session.delete(url, **kwargs)
-        self.check_status_code(response, 'Could Not Complete Request')
+        self.check_status_code(response, "Could Not Complete Request")
 
         try:
             return response.json()
@@ -278,7 +266,7 @@ class TickTickClient:
             RunTimeError: If the request could not be completed.
         """
         response = self._session.put(url, **kwargs)
-        self.check_status_code(response, 'Could Not Complete Request')
+        self.check_status_code(response, "Could Not Complete Request")
 
         try:
             return response.json()
@@ -303,7 +291,7 @@ class TickTickClient:
         Returns:
             Id string of the object.
         """
-        id_tag = response['id2etag']
+        id_tag = response["id2etag"]
         id_tag = list(id_tag.keys())
         return id_tag[0]
 
@@ -327,7 +315,7 @@ class TickTickClient:
         Return:
             A single etag string if not multiple, or a list of etag strings if multiple.
         """
-        etag = response['id2etag']
+        etag = response["id2etag"]
         etag2 = list(etag.keys())
         if not multiple:
             return etag[etag2[0]]
@@ -390,11 +378,10 @@ class TickTickClient:
             KeyError: If the search key provided is not a key in `state`.
         """
         if kwargs == {}:
-            raise ValueError('Must Include Field(s) To Be Searched For')
+            raise ValueError("Must Include Field(s) To Be Searched For")
 
         if search is not None and search not in self.state:
-            raise KeyError(
-                f"'{search}' Is Not Present In self.state Dictionary")
+            raise KeyError(f"'{search}' Is Not Present In self.state Dictionary")
 
         objects = []
         if search is not None:
@@ -488,22 +475,21 @@ class TickTickClient:
             KeyError: If the search key provided is not a key in [`state`](api.md#state).
         """
         if search is not None and search not in self.state:
-            raise KeyError(
-                f"'{search}' Is Not Present In self.state Dictionary")
+            raise KeyError(f"'{search}' Is Not Present In self.state Dictionary")
 
         # Search just in the desired list
         if search is not None:
             for index in self.state[search]:
-                if index['id'] == obj_id:
+                if index["id"] == obj_id:
                     return index
 
         else:
             # Search all items in self.state
             for prim_key in self.state:
                 for our_object in self.state[prim_key]:
-                    if 'id' not in our_object:
+                    if "id" not in our_object:
                         break
-                    if our_object['id'] == obj_id:
+                    if our_object["id"] == obj_id:
                         return our_object
         # Return empty dictionary if not found
         return {}
@@ -555,22 +541,21 @@ class TickTickClient:
 
         """
         if search is not None and search not in self.state:
-            raise KeyError(
-                f"'{search}' Is Not Present In self.state Dictionary")
+            raise KeyError(f"'{search}' Is Not Present In self.state Dictionary")
 
         # Search just in the desired list
         if search is not None:
             for index in self.state[search]:
-                if index['etag'] == etag:
+                if index["etag"] == etag:
                     return index
 
         else:
             # Search all items in self.state
             for prim_key in self.state:
                 for our_object in self.state[prim_key]:
-                    if 'etag' not in our_object:
+                    if "etag" not in our_object:
                         break
-                    if our_object['etag'] == etag:
+                    if our_object["etag"] == etag:
                         return our_object
         # Return empty dictionary if not found
         return {}
@@ -628,11 +613,10 @@ class TickTickClient:
         """
         # Check that kwargs is not empty
         if kwargs == {}:
-            raise ValueError('Must Include Field(s) To Be Searched For')
+            raise ValueError("Must Include Field(s) To Be Searched For")
 
         if search is not None and search not in self.state:
-            raise KeyError(
-                f"'{search}' Is Not Present In self.state Dictionary")
+            raise KeyError(f"'{search}' Is Not Present In self.state Dictionary")
 
         # Search just in the desired list
         if search is not None:
